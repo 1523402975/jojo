@@ -3,15 +3,16 @@
 namespace app\controllers;
 
 use app\models\EntryForm;
+use app\modules\backend\models\User;
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Controller;
+use yii\helpers\Url;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
-class SiteController extends Controller
+class SiteController extends BaseController
 {
     /**
      * @inheritdoc
@@ -137,6 +138,37 @@ class SiteController extends Controller
             return $this->render('entry-confirm', ['model' => $model]);
         } else {
             return $this->render('entry', ['model' => $model]);
+        }
+    }
+    
+    public function actionSignUp()
+    {
+        if (\Yii::$app->request->isPost) {
+
+            if (get_post('password') != get_post('password_repeat')) {
+                return $this->asJson([
+                    'code' => 1,
+                    'message' => '两次密码不一致！'
+                ]);
+            }
+
+            $user = new User();
+            $user->username = get_post('username');
+            $user->password = get_security()->generatePasswordHash(get_post('password'));
+            $user->auth_key = get_security()->generateRandomString();
+
+            if ($user->save()) {
+                return $this->redirect(Url::to('/'));
+            } else {
+                var_dump($user->getErrors());
+                exit();
+            }
+        } else {
+            $model = new \app\modules\backend\models\User();
+
+            return $this->render('@views/site/sign-up', [
+                'model' => $model,
+            ]);
         }
     }
 }

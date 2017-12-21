@@ -15,4 +15,28 @@ use yii\web\Controller;
 class BaseController extends Controller
 {
 
+    public static function request()
+    {
+        return \Yii::$app->request;
+    }
+
+    public static function response()
+    {
+        return \Yii::$app->response;
+    }
+
+    public static function post($name = null, $defaultValue = null)
+    {
+        return static::request()->post($name, $defaultValue);
+    }
+
+    public static function get($name = null, $defaultValue = null)
+    {
+        return static::request()->get($name, $defaultValue);
+    }
+
+    public static function security()
+    {
+        return \Yii::$app->getSecurity();
+    }
 }
